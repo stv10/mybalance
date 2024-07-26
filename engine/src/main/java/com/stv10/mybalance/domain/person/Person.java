@@ -1,9 +1,9 @@
 package com.stv10.mybalance.domain.person;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -15,7 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @Data
 @Document("persons")
-@Builder
+@SuperBuilder
 public class Person {
     @Id
     private String id;

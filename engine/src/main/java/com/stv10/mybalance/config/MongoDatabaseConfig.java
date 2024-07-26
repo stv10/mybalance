@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.data.mongodb.MongoDatabaseFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -32,6 +33,11 @@ public class MongoDatabaseConfig {
     public MongoDatabaseFactory mongoDatabaseFactory(){
         return new SimpleMongoClientDatabaseFactory("%s%s".formatted(mongoURI, database));
 //        return new SimpleMongoClientDatabaseFactory("%s%s%s".formatted(mongoURI, database, options));
+    }
+
+    @Bean
+    public MongoTemplate mongoTemplate() {
+        return new MongoTemplate(mongoDatabaseFactory());
     }
 
 }
