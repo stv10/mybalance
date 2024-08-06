@@ -1,4 +1,4 @@
-package com.stv10.mybalance.domain.login.dto;
+package com.stv10.mybalance.domain.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,4 +11,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class AuthResponseDTO {
     private String token;
+    private String message;
 }
