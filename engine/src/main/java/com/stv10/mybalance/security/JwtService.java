@@ -1,5 +1,6 @@
 package com.stv10.mybalance.security;
 
+import com.stv10.mybalance.domain.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import lombok.RequiredArgsConstructor;
@@ -7,9 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.security.PrivateKey;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -20,11 +21,15 @@ import java.util.function.Function;
 public class JwtService {
     private final KeyUtils keyUtils;
 
-    public String generateToken(UserDetails user) {
-        return getToken(Map.of(), user);
+    public String generateToken(User user) {
+        HashMap<String, Object> extra = new HashMap<>();
+        extra.put("role", user.getRole());
+        extra.put("id", user.getId());
+        extra.put("email", user.getEmail());
+        return getToken(extra, user);
     }
 
-    private String getToken(Map<String,Object> extra, UserDetails user) {
+    private String getToken(Map<String,Object> extra, User user) {
 
         try {
             PrivateKey privateKey = keyUtils.getPrivateKey();
@@ -52,7 +57,7 @@ public class JwtService {
 
     public Optional<Claims> getAllClaims(String token) throws Exception {
         return Optional.of(Jwts.parser()
-                .verifyWith(keyUtils.getPublicKey()).build().parseSignedClaims(token).getBody());
+                .verifyWith(keyUtils.getPublicKey()).build().parseSignedClaims(token).getPayload());
     }
 
     public <T> T getClaim(String token, Function<Optional<Claims>,T> claimsResolver) throws Exception {

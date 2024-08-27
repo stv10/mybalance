@@ -19,8 +19,7 @@ public class JwtUtils {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, 1);
 
-        Claims claims = Jwts.claims().subject(subject).build();
-        claims.putAll(extra);
+        Claims claims = Jwts.claims().subject(subject).add(extra).build();
 
         return Jwts.builder()
                 .claims(claims)
