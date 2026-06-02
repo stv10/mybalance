@@ -1,0 +1,104 @@
+// ==========================================
+// Proyecto: MyBalance - Esquema de Base de Datos v3
+// ==========================================
+
+Table users {
+  id uuid [pk, note: 'Generado automáticamente por Hibernate']
+  name varchar(100) [not null]
+  email varchar(150) [unique, not null]
+  password_hash varchar [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+// ------------------------------------------
+// 💳 CUENTAS (BANCOS, APPS, EFECTIVO)
+// ------------------------------------------
+Table accounts {
+  id uuid [pk]
+  user_id uuid [not null]
+  name varchar(100) [not null]
+  balance decimal(15,2) [not null, default: 0.00]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table categories {
+  id uuid [pk]
+  user_id uuid [not null, note: 'Categorías personalizadas por usuario']
+  name varchar(100) [not null]
+  type varchar(20) [not null, note: 'Puede ser "income" o "expense"']
+  created_at timestamp [default: `now()`]
+}
+
+// ------------------------------------------
+// 💰 TRANSACCIONES UNIFICADAS
+// ------------------------------------------
+Table transactions {
+  id uuid [pk]
+  account_id uuid [not null]
+  category_id uuid [not null]
+  type varchar(20) [not null, note: 'Identificador: "income" o "expense"']
+  amount decimal(15,2) [not null]
+  description text
+  date date [not null, note: 'Fecha en la que ocurrió la transacción']
+  created_at timestamp [default: `now()`]
+}
+
+// ------------------------------------------
+// 🏗️ MODELO DE PRESUPUESTO (PLANTILLA)
+// ------------------------------------------
+Table budget_models {
+  id uuid [pk]
+  user_id uuid [not null, unique, note: 'Relación 1 a 1: Un modelo activo por usuario']
+  total_limit decimal(15,2) [not null, note: 'Límite total predeterminado (el molde)']
+  created_at timestamp [default: `now()`]
+  updated_at timestamp
+}
+
+Table budget_model_categories {
+  id uuid [pk]
+  budget_model_id uuid [not null]
+  category_id uuid [not null]
+  amount_limit decimal(15,2) [not null, note: 'Límite predeterminado para esta categoría']
+}
+
+// ------------------------------------------
+// 📅 PRESUPUESTOS MENSUALES (INSTANCIAS)
+// ------------------------------------------
+Table monthly_budgets {
+  id uuid [pk]
+  user_id uuid [not null]
+  month int [not null, note: 'Mes del presupuesto (1-12)']
+  year int [not null, note: 'Año del presupuesto (ej. 2026)']
+  total_limit decimal(15,2) [not null, note: 'Límite total copiado del modelo para este mes específico']
+  created_at timestamp [default: `now()`]
+}
+
+Table monthly_budget_categories {
+  id uuid [pk]
+  monthly_budget_id uuid [not null]
+  category_id uuid [not null]
+  amount_limit decimal(15,2) [not null, note: 'Límite de categoría específico para este mes']
+}
+
+// ==========================================
+// Relaciones (Foreign Keys)
+// ==========================================
+
+// Relaciones directas del Usuario
+Ref: accounts.user_id > users.id [delete: cascade]
+Ref: categories.user_id > users.id [delete: cascade]
+Ref: budget_models.user_id - users.id [delete: cascade] // Relación 1-to-1
+Ref: monthly_budgets.user_id > users.id [delete: cascade]
+
+// Relación de Transacciones
+Ref: transactions.account_id > accounts.id [delete: restrict]
+Ref: transactions.category_id > categories.id [delete: restrict]
+
+// Relaciones del Modelo de Presupuesto (Plantilla)
+Ref: budget_model_categories.budget_model_id > budget_models.id [delete: cascade]
+Ref: budget_model_categories.category_id > categories.id [delete: cascade]
+
+// Relaciones de los Presupuestos Mensuales (Historial/Instancias)
+Ref: monthly_budget_categories.monthly_budget_id > monthly_budgets.id [delete: cascade]
+Ref: monthly_budget_categories.category_id > categories.id [delete: cascade]
+

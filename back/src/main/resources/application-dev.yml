@@ -1,0 +1,30 @@
+spring:
+  config:
+    # Carga opcional de secretos locales (ej. tokens de Telegram). Este archivo está ignorado por git.
+    # Crea 'application-local.yml' en esta carpeta para definir tus secretos locales.
+    import: optional:classpath:application-local.yml
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mybalance
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+    show-sql: true
+
+logging:
+  level:
+    com.mybalance: DEBUG
+    org.hibernate.SQL: DEBUG
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:jwt-dev-secret-key-only-for-local-testing-purposes-do-not-use-in-production-1234567890}
+    expiration-ms: 86400000
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:}
+    username: ${TELEGRAM_BOT_USERNAME:}

@@ -1,0 +1,42 @@
+# System Files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.local
+
+# IDE and Editor Files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.factorypath
+.project
+.classpath
+.settings/
+.springBeans
+.sts4-cache/
+
+# Backend (Java / Spring Boot)
+back/target/
+back/bin/
+back/build/
+
+# Frontend (Node / React / Vite)
+front/node_modules/
+front/dist/
+front/dist-ssr/
+front/npm-debug.log*
+front/yarn-debug.log*
+front/yarn-error.log*
+front/pnpm-debug.log*
+front/lerna-debug.log*
+
+# Secret and Local Configuration Overrides
+**/src/main/resources/application-local.yml
+**/src/main/resources/application-local.properties
+**/front/.env*
+!**/front/.env.example
