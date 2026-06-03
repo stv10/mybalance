@@ -47,4 +47,28 @@ public class Category {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    public boolean isOrInheritsFrom(String targetName) {
+        Category current = this;
+        while (current != null) {
+            if (current.getName().equalsIgnoreCase(targetName)) {
+                return true;
+            }
+            current = current.getParent();
+        }
+        return false;
+    }
+
+    public String getBaseCategoryName() {
+        if (isOrInheritsFrom("Vida")) {
+            return "Vida";
+        }
+        if (isOrInheritsFrom("Ocio")) {
+            return "Ocio";
+        }
+        if (isOrInheritsFrom("Inversion-Deuda")) {
+            return "Inversion-Deuda";
+        }
+        return null;
+    }
 }

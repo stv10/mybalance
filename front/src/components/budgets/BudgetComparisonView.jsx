@@ -81,14 +81,10 @@ const BudgetComparisonView = ({
     });
 
     sortedItems.forEach(item => {
-      let catName = item.categoryName || 'Vida'; // fallback seguro
-      if (catName.toLowerCase() === 'comida') {
-        catName = 'Vida';
-      }
+      const catName = item.baseCategoryName || 'Vida'; // fallback seguro
       if (grouped[catName]) {
         grouped[catName].items.push(item);
       } else {
-        // En caso de que se filtre otra, lo agrupamos en Vida por defecto
         grouped['Vida'].items.push(item);
       }
     });

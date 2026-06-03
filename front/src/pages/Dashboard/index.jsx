@@ -383,6 +383,11 @@ const Dashboard = () => {
                   onCreateAccount={createAccount}
                   onUpdateAccount={updateAccount}
                   onDeleteAccount={handleDeleteAccount}
+                  onTransfer={async (transferData) => {
+                    await apiService.createTransfer(transferData);
+                    await Promise.all([loadAccounts(), loadTransactions()]);
+                    showToast('Transferencia realizada con éxito', 'success');
+                  }}
                 />
               )}
 

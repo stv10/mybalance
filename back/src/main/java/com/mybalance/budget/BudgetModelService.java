@@ -69,15 +69,13 @@ public class BudgetModelService {
                 Category category = categoryRepository.findByIdAndUserEmail(itemReq.categoryId(), email)
                         .orElseThrow(() -> new ResourceNotFoundException("Category", itemReq.categoryId().toString()));
 
-                boolean isValidCategory = !category.isUserCreated() &&
-                        category.getType() == CategoryType.EXPENSE &&
-                        (category.getName().equals("Vida") ||
-                         category.getName().equals("Ocio") ||
-                         category.getName().equals("Inversion-Deuda") ||
-                         category.getName().equals("Comida"));
+                boolean isValidCategory = category.getType() == CategoryType.EXPENSE &&
+                        (category.isOrInheritsFrom("Vida") ||
+                         category.isOrInheritsFrom("Ocio") ||
+                         category.isOrInheritsFrom("Inversion-Deuda"));
 
                 if (!isValidCategory) {
-                    throw new BusinessException("El ítem de presupuesto '" + itemReq.name() + "' únicamente se puede asociar a una de las categorías base de Gastos: Vida, Ocio, Inversion-Deuda o Comida.");
+                    throw new BusinessException("El ítem de presupuesto '" + itemReq.name() + "' únicamente se puede asociar a una categoría de Gastos que pertenezca a Vida, Ocio o Inversion-Deuda.");
                 }
 
                 BudgetModelItem item = BudgetModelItem.builder()
@@ -128,6 +126,7 @@ public class BudgetModelService {
                 item.getName(),
                 item.getCategory().getId(),
                 item.getCategory().getName(),
+                item.getCategory().getBaseCategoryName(),
                 item.getAmountLimit(),
                 item.getDueDay()
         );

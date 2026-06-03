@@ -3,6 +3,7 @@ package com.mybalance.transaction;
 import com.mybalance.shared.response.ApiResponse;
 import com.mybalance.transaction.dto.TransactionRequest;
 import com.mybalance.transaction.dto.TransactionResponse;
+import com.mybalance.transaction.dto.TransferRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,14 @@ public class TransactionController {
         TransactionResponse transaction = transactionService.createTransaction(request, email);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.ok("Transacción creada exitosamente", transaction));
+    }
+
+    @PostMapping("/transfer")
+    public ResponseEntity<ApiResponse<Void>> executeTransfer(
+            @Valid @RequestBody TransferRequest request,
+            @AuthenticationPrincipal String email) {
+        transactionService.executeTransfer(request, email);
+        return ResponseEntity.ok(ApiResponse.ok("Transferencia realizada exitosamente", null));
     }
 
     @PutMapping("/{id}")

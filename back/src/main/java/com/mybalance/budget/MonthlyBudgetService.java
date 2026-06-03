@@ -205,15 +205,13 @@ public class MonthlyBudgetService {
                 Category category = categoryRepository.findByIdAndUserEmail(itemReq.categoryId(), email)
                         .orElseThrow(() -> new ResourceNotFoundException("Category", itemReq.categoryId().toString()));
 
-                boolean isValidCategory = !category.isUserCreated() &&
-                        category.getType() == CategoryType.EXPENSE &&
-                        (category.getName().equals("Vida") ||
-                         category.getName().equals("Ocio") ||
-                         category.getName().equals("Inversion-Deuda") ||
-                         category.getName().equals("Comida"));
+                boolean isValidCategory = category.getType() == CategoryType.EXPENSE &&
+                        (category.isOrInheritsFrom("Vida") ||
+                         category.isOrInheritsFrom("Ocio") ||
+                         category.isOrInheritsFrom("Inversion-Deuda"));
 
                 if (!isValidCategory) {
-                    throw new BusinessException("El ítem de presupuesto '" + itemReq.name() + "' únicamente se puede asociar a una de las categorías base de Gastos: Vida, Ocio, Inversion-Deuda o Comida.");
+                    throw new BusinessException("El ítem de presupuesto '" + itemReq.name() + "' únicamente se puede asociar a una categoría de Gastos que pertenezca a Vida, Ocio o Inversion-Deuda.");
                 }
 
                 Integer dueDay = itemReq.dueDay();
@@ -245,6 +243,7 @@ public class MonthlyBudgetService {
                         item.getName(),
                         item.getCategory().getId(),
                         item.getCategory().getName(),
+                        item.getCategory().getBaseCategoryName(),
                         item.getAmountLimit(),
                         item.getDueDay()))
                 .collect(Collectors.toList());
@@ -276,7 +275,7 @@ public class MonthlyBudgetService {
             LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
             List<Transaction> transactions = transactionRepository.findByAccountUserEmailAndDateBetween(email, startDate, endDate);
             comidaSpent = transactions.stream()
-                    .filter(tx -> tx.getType() == CategoryType.EXPENSE && isOrInheritsFrom(tx.getCategory(), "Comida"))
+                    .filter(tx -> tx.getType() == CategoryType.EXPENSE && tx.getCategory().isOrInheritsFrom("Comida"))
                     .map(Transaction::getAmount)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
         }
@@ -393,6 +392,7 @@ public class MonthlyBudgetService {
                 item.getName(),
                 item.getCategory().getId(),
                 item.getCategory().getName(),
+                item.getCategory().getBaseCategoryName(),
                 item.getAmountLimit(),
                 item.isPaid(),
                 txId,
@@ -401,16 +401,5 @@ public class MonthlyBudgetService {
                 item.getDueDay(),
                 item.getDueDate()
         );
-    }
-
-    private boolean isOrInheritsFrom(Category category, String targetName) {
-        Category current = category;
-        while (current != null) {
-            if (current.getName().equalsIgnoreCase(targetName)) {
-                return true;
-            }
-            current = current.getParent();
-        }
-        return false;
     }
 }
