@@ -46,7 +46,7 @@ const BudgetItemConfigRow = React.memo(({
         >
           {baseCategories.map(cat => (
             <option key={cat.id} value={cat.id}>
-              {cat.name}
+              {cat.parentCategoryName ? `${cat.name} (${cat.parentCategoryName})` : cat.name}
             </option>
           ))}
         </select>

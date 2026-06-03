@@ -9,6 +9,7 @@ import com.mybalance.shared.exception.BusinessException;
 import com.mybalance.shared.exception.ResourceNotFoundException;
 import com.mybalance.transaction.dto.TransactionRequest;
 import com.mybalance.transaction.dto.TransactionResponse;
+import com.mybalance.transaction.dto.TransferRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,6 +141,65 @@ public class TransactionService {
 
         accountRepository.save(account);
         transactionRepository.delete(transaction);
+    }
+
+    @Transactional
+    public void executeTransfer(TransferRequest request, String email) {
+        if (request.sourceAccountId().equals(request.destinationAccountId())) {
+            throw new BusinessException("La cuenta origen y destino deben ser diferentes.");
+        }
+
+        Account sourceAccount = accountRepository.findByIdAndUserEmail(request.sourceAccountId(), email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", request.sourceAccountId().toString()));
+
+        Account destinationAccount = accountRepository.findByIdAndUserEmail(request.destinationAccountId(), email)
+                .orElseThrow(() -> new ResourceNotFoundException("Account", request.destinationAccountId().toString()));
+
+        Category transferExpense = getOrCreateTransferCategory(sourceAccount.getUser(), CategoryType.EXPENSE);
+        Category transferIncome = getOrCreateTransferCategory(sourceAccount.getUser(), CategoryType.INCOME);
+
+        sourceAccount.debit(request.amount());
+        destinationAccount.credit(request.amount());
+        accountRepository.save(sourceAccount);
+        accountRepository.save(destinationAccount);
+
+        String desc = request.description() != null && !request.description().trim().isEmpty() 
+                ? request.description().trim() 
+                : "Transferencia de " + sourceAccount.getName() + " a " + destinationAccount.getName();
+
+        Transaction sourceTx = Transaction.builder()
+                .account(sourceAccount)
+                .category(transferExpense)
+                .type(CategoryType.EXPENSE)
+                .amount(request.amount())
+                .description(desc)
+                .date(request.date())
+                .build();
+
+        Transaction destTx = Transaction.builder()
+                .account(destinationAccount)
+                .category(transferIncome)
+                .type(CategoryType.INCOME)
+                .amount(request.amount())
+                .description(desc)
+                .date(request.date())
+                .build();
+
+        transactionRepository.save(sourceTx);
+        transactionRepository.save(destTx);
+    }
+
+    private Category getOrCreateTransferCategory(com.mybalance.auth.User user, CategoryType type) {
+        return categoryRepository.findByUserEmailAndNameAndType(user.getEmail(), "Transferencia", type)
+                .orElseGet(() -> {
+                    Category transfer = Category.builder()
+                            .user(user)
+                            .name("Transferencia")
+                            .type(type)
+                            .isUserCreated(false)
+                            .build();
+                    return categoryRepository.save(transfer);
+                });
     }
 
     private TransactionResponse mapToResponse(Transaction transaction) {

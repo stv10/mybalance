@@ -114,6 +114,15 @@ export const apiService = {
     });
     return handleResponse(response);
   },
+ 
+  createTransfer: async (transferData) => {
+    const response = await fetch(`${API_BASE_URL}/transactions/transfer`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(transferData),
+    });
+    return handleResponse(response);
+  },
 
   // Accounts API
   getAccounts: async () => {

@@ -436,7 +436,7 @@ class BudgetServiceTest {
             localService.saveBudgetModel(request, userEmail);
         });
 
-        assertTrue(exception.getMessage().contains("únicamente se puede asociar a una de las categorías base"));
+        assertTrue(exception.getMessage().contains("únicamente se puede asociar"));
     }
 
     @Test

@@ -10,14 +10,30 @@ import BudgetItemConfigRow from './BudgetItemConfigRow';
  * Refactorizado en subcomponentes pequeños y optimizado bajo Vercel React Best Practices.
  */
 const BudgetModelConfig = ({ categories = [], initialModel, onSave, isSaving }) => {
-  // Las categorías permitidas para presupuesto: base (sin categoría padre) o "Comida"
+  // Helper para verificar recursivamente la jerarquía de categorías
+  const isOrInheritsFrom = useCallback((cat, targetName) => {
+    let current = cat;
+    while (current) {
+      if (current.name?.toLowerCase() === targetName.toLowerCase()) {
+        return true;
+      }
+      if (!current.parentCategoryId) {
+        break;
+      }
+      current = categories.find(c => c.id === current.parentCategoryId);
+    }
+    return false;
+  }, [categories]);
+
+  // Las categorías permitidas para presupuesto: de tipo EXPENSE que sean o hereden de Vida, Ocio o Inversion-Deuda
   const baseCategories = useMemo(() => {
     return categories.filter(cat => 
-      !cat.isUserCreated && 
       cat.type === 'EXPENSE' && 
-      (!cat.parentCategoryId || cat.name?.toLowerCase() === 'comida')
+      (isOrInheritsFrom(cat, 'Vida') || 
+       isOrInheritsFrom(cat, 'Ocio') || 
+       isOrInheritsFrom(cat, 'Inversion-Deuda'))
     );
-  }, [categories]);
+  }, [categories, isOrInheritsFrom]);
 
   // Estados del formulario
   const [globalLimit, setGlobalLimit] = useState('');
@@ -76,13 +92,13 @@ const BudgetModelConfig = ({ categories = [], initialModel, onSave, isSaving }) 
       const amt = Number(item.amountLimit) || 0;
       const cat = baseCategories.find(c => c.id === item.categoryId);
       if (cat) {
-        if (cat.name === 'Vida' || cat.name?.toLowerCase() === 'comida') sv += amt;
-        else if (cat.name === 'Ocio') so += amt;
-        else if (cat.name === 'Inversion-Deuda') si += amt;
+        if (isOrInheritsFrom(cat, 'Vida')) sv += amt;
+        else if (isOrInheritsFrom(cat, 'Ocio')) so += amt;
+        else if (isOrInheritsFrom(cat, 'Inversion-Deuda')) si += amt;
       }
     });
     return { sumVida: sv, sumOcio: so, sumInv: si };
-  }, [items, baseCategories]);
+  }, [items, baseCategories, isOrInheritsFrom]);
 
   // Advertencias de límites
   const warningVida = sumVida > maxVida;

@@ -8,6 +8,7 @@ import com.mybalance.category.CategoryType;
 import com.mybalance.shared.exception.BusinessException;
 import com.mybalance.transaction.dto.TransactionRequest;
 import com.mybalance.transaction.dto.TransactionResponse;
+import com.mybalance.transaction.dto.TransferRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -203,5 +204,56 @@ class TransactionServiceTest {
         assertEquals(new BigDecimal("100.00"), account.getBalance());
         verify(accountRepository, times(1)).save(account);
         verify(transactionRepository, times(1)).delete(transaction);
+    }
+
+    @Test
+    @DisplayName("Debería realizar una transferencia entre dos cuentas con éxito")
+    void testExecuteTransferSuccess() {
+        UUID destinationAccountId = UUID.randomUUID();
+        com.mybalance.auth.User user = com.mybalance.auth.User.builder().email(userEmail).build();
+        account.setUser(user);
+
+        Account destinationAccount = Account.builder()
+                .id(destinationAccountId)
+                .name("Otra Cuenta")
+                .balance(new BigDecimal("50.00"))
+                .user(user)
+                .build();
+
+        UUID transferExpenseCategoryId = UUID.randomUUID();
+        Category transferExpenseCategory = Category.builder()
+                .id(transferExpenseCategoryId)
+                .name("Transferencia")
+                .type(CategoryType.EXPENSE)
+                .build();
+
+        UUID transferIncomeCategoryId = UUID.randomUUID();
+        Category transferIncomeCategory = Category.builder()
+                .id(transferIncomeCategoryId)
+                .name("Transferencia")
+                .type(CategoryType.INCOME)
+                .build();
+
+        TransferRequest request = new TransferRequest(
+                accountId, destinationAccountId, new BigDecimal("30.00"), "Transferencia de test", LocalDate.now()
+        );
+
+        when(accountRepository.findByIdAndUserEmail(accountId, userEmail)).thenReturn(Optional.of(account));
+        when(accountRepository.findByIdAndUserEmail(destinationAccountId, userEmail)).thenReturn(Optional.of(destinationAccount));
+        
+        when(categoryRepository.findByUserEmailAndNameAndType(userEmail, "Transferencia", CategoryType.EXPENSE))
+                .thenReturn(Optional.of(transferExpenseCategory));
+        when(categoryRepository.findByUserEmailAndNameAndType(userEmail, "Transferencia", CategoryType.INCOME))
+                .thenReturn(Optional.of(transferIncomeCategory));
+
+        transactionService.executeTransfer(request, userEmail);
+
+        // Account balances: source debit (-30), dest credit (+30)
+        assertEquals(new BigDecimal("70.00"), account.getBalance()); // 100.00 - 30.00
+        assertEquals(new BigDecimal("80.00"), destinationAccount.getBalance()); // 50.00 + 30.00
+
+        verify(accountRepository, times(1)).save(account);
+        verify(accountRepository, times(1)).save(destinationAccount);
+        verify(transactionRepository, times(2)).save(any(Transaction.class));
     }
 }

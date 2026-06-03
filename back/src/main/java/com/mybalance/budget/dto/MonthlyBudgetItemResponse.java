@@ -9,6 +9,7 @@ public record MonthlyBudgetItemResponse(
         String name,
         UUID categoryId,
         String categoryName,
+        String baseCategoryName,
         BigDecimal amountLimit,
         boolean paid,
         UUID transactionId,

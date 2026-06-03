@@ -8,6 +8,7 @@ public record BudgetItemResponse(
         String name,
         UUID categoryId,
         String categoryName,
+        String baseCategoryName,
         BigDecimal amountLimit,
         Integer dueDay
 ) {}

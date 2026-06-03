@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { CreditCard, Edit2, Trash2, AlertCircle } from 'lucide-react';
+import { CreditCard, Edit2, Trash2, AlertCircle, ArrowLeftRight } from 'lucide-react';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 import AmountInput from '../../components/ui/AmountInput';
+import TransferModal from '../../components/accounts/TransferModal';
 
 const CARD_GRADIENTS = [
   'linear-gradient(135deg, #6366f1 0%, #3b82f6 100%)', // Indigo-Blue
@@ -13,11 +14,27 @@ const CARD_GRADIENTS = [
 /**
  * AccountsTab — Pestaña premium para gestionar las cuentas del usuario.
  */
-const AccountsTab = ({ accounts, onCreateAccount, onUpdateAccount, onDeleteAccount }) => {
+const AccountsTab = ({ accounts, onCreateAccount, onUpdateAccount, onDeleteAccount, onTransfer }) => {
   const [formData, setFormData] = useState({ name: '', balance: '' });
   const [editingId, setEditingId] = useState(null);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
+  const [isTransferSubmitting, setIsTransferSubmitting] = useState(false);
+
+  const handleTransferConfirm = async (transferData) => {
+    setIsTransferSubmitting(true);
+    try {
+      if (onTransfer) {
+        await onTransfer(transferData);
+        setIsTransferModalOpen(false);
+      }
+    } catch {
+      // Errores gestionados por el parent y mostrados vía toast
+    } finally {
+      setIsTransferSubmitting(false);
+    }
+  };
 
   const handleEditClick = (account) => {
     setEditingId(account.id);
@@ -78,8 +95,29 @@ const AccountsTab = ({ accounts, onCreateAccount, onUpdateAccount, onDeleteAccou
     <div className="accounts-tab-container animate-fade-in" style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
       {/* List of accounts on the left */}
       <div style={{ flex: '2 1 500px', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Mis Cuentas</h2>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700 }}>Mis Cuentas</h2>
+            {accounts.length > 1 && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setIsTransferModalOpen(true)}
+                style={{
+                  width: 'auto',
+                  padding: '0.4rem 0.8rem',
+                  fontSize: '0.8rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  fontWeight: 600
+                }}
+              >
+                <ArrowLeftRight size={14} />
+                <span>Transferencia Rápida</span>
+              </button>
+            )}
+          </div>
           <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
             {accounts.length} {accounts.length === 1 ? 'cuenta activa' : 'cuentas activas'}
           </span>
@@ -272,8 +310,16 @@ const AccountsTab = ({ accounts, onCreateAccount, onUpdateAccount, onDeleteAccou
           </form>
         </div>
       </div>
+      {/* Modal de Transferencia Rápida */}
+      <TransferModal
+        isOpen={isTransferModalOpen}
+        accounts={accounts}
+        onClose={() => setIsTransferModalOpen(false)}
+        onConfirm={handleTransferConfirm}
+        isSubmitting={isTransferSubmitting}
+      />
     </div>
   );
 };
-
+ 
 export default AccountsTab;
