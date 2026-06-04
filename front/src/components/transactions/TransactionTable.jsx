@@ -32,10 +32,19 @@ const TransactionTable = ({ transactions, onEdit, onDelete }) => {
                 <td style={{ fontWeight: 500 }}>
                   {formatDate(tx.date)}
                 </td>
-                <td style={{ fontWeight: 600 }}>
-                  {tx.description || (
-                    <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin descripción</span>
-                  )}
+                <td style={{ verticalAlign: 'middle' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
+                      {tx.description || (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontWeight: 400 }}>Sin título</span>
+                      )}
+                    </span>
+                    {tx.notes && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem', fontWeight: 400 }}>
+                        {tx.notes}
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td>
                   <span className="badge badge-neutral">{tx.categoryName}</span>
@@ -95,11 +104,18 @@ const TransactionTable = ({ transactions, onEdit, onDelete }) => {
               
               <div className="tx-card-body">
                 <div className="tx-card-main-info">
-                  <h4 className="tx-card-description">
-                    {tx.description || (
-                      <span style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>Sin descripción</span>
+                  <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+                    <h4 className="tx-card-description" style={{ margin: 0 }}>
+                      {tx.description || (
+                        <span style={{ color: 'var(--text-muted)', fontStyle: 'italic', fontWeight: 400 }}>Sin título</span>
+                      )}
+                    </h4>
+                    {tx.notes && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.15rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {tx.notes}
+                      </span>
                     )}
-                  </h4>
+                  </div>
                   <div className="tx-card-badges">
                     <span className="badge badge-neutral">{tx.categoryName}</span>
                     <span className="badge badge-neutral" style={{ backgroundColor: 'var(--primary-glow)', color: 'var(--primary)', borderColor: 'rgba(99, 102, 241, 0.1)' }}>

@@ -23,8 +23,11 @@ public record TransactionRequest(
         @DecimalMin(value = "0.01", message = "El monto debe ser mayor que cero")
         BigDecimal amount,
 
-        @Size(max = 255, message = "La descripción no debe exceder 255 caracteres")
+        @Size(max = 32, message = "El título no debe exceder 32 caracteres")
         String description,
+
+        @Size(max = 256, message = "Las observaciones no deben exceder 256 caracteres")
+        String notes,
 
         @NotNull(message = "La fecha es obligatoria")
         LocalDate date

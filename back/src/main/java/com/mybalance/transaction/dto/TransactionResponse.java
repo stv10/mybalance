@@ -15,6 +15,7 @@ public record TransactionResponse(
         CategoryType type,
         BigDecimal amount,
         String description,
+        String notes,
         LocalDate date,
         LocalDateTime createdAt
 ) {}

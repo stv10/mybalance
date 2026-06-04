@@ -28,7 +28,8 @@ CREATE TABLE "transactions" (
   "category_id" uuid NOT NULL,
   "type" varchar(20) NOT NULL,
   "amount" decimal(15,2) NOT NULL,
-  "description" text,
+  "description" varchar(32),
+  "notes" varchar(256),
   "date" date NOT NULL,
   "created_at" timestamp DEFAULT (now())
 );

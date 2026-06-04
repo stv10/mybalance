@@ -30,6 +30,7 @@ const makeInitialForm = (categories = [], accounts = []) => {
     type: 'EXPENSE',
     amount: '',
     description: '',
+    notes: '',
     date: new Date().toISOString().split('T')[0],
   };
 };
@@ -139,6 +140,7 @@ const Dashboard = () => {
       const searchMatch =
         txSearch === '' ||
         tx.description?.toLowerCase().includes(txSearch.toLowerCase()) ||
+        tx.notes?.toLowerCase().includes(txSearch.toLowerCase()) ||
         tx.categoryName?.toLowerCase().includes(txSearch.toLowerCase());
       const typeMatch = txTypeFilter === 'ALL' || tx.type === txTypeFilter;
       const categoryMatch = txCategoryFilter === 'ALL' || tx.categoryId === txCategoryFilter;
@@ -195,6 +197,7 @@ const Dashboard = () => {
       type: tx.type,
       amount: tx.amount.toString(),
       description: tx.description || '',
+      notes: tx.notes || '',
       date: tx.date,
     });
     setTxFormErrors({});
@@ -231,6 +234,7 @@ const Dashboard = () => {
         type: txFormData.type,
         amount: parseFloat(txFormData.amount),
         description: txFormData.description.trim(),
+        notes: txFormData.notes ? txFormData.notes.trim() : '',
         date: txFormData.date,
       };
 

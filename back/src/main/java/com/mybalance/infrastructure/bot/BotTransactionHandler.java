@@ -99,13 +99,26 @@ public class BotTransactionHandler {
         }
         accountRepository.save(account);
 
+        // Truncar descripción a 32 caracteres para usarla como título
+        String title = originalText.trim();
+        if (title.length() > 32) {
+            title = title.substring(0, 32);
+        }
+
+        // Truncar notas a 256 caracteres
+        String notes = originalText.trim();
+        if (notes.length() > 256) {
+            notes = notes.substring(0, 256);
+        }
+
         // 5. Guardar la Transacción
         Transaction transaction = Transaction.builder()
                 .account(account)
                 .category(category)
                 .type(transactionType)
                 .amount(aiResult.amount())
-                .description(originalText.trim())
+                .description(title)
+                .notes(notes)
                 .date(LocalDate.now())
                 .build();
 

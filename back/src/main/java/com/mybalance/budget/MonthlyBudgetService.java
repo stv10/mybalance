@@ -323,13 +323,24 @@ public class MonthlyBudgetService {
             throw new BusinessException("El ítem de presupuesto '" + item.getName() + "' ya se encuentra marcado como pagado.");
         }
 
+        String payTitle = "Pago: " + item.getName();
+        if (payTitle.length() > 32) {
+            payTitle = payTitle.substring(0, 32);
+        }
+        
+        String payNotes = "Pago de presupuesto: " + item.getName();
+        if (payNotes.length() > 256) {
+            payNotes = payNotes.substring(0, 256);
+        }
+
         // Crear la transacción usando TransactionService
         TransactionRequest txRequest = new TransactionRequest(
                 request.accountId(),
                 item.getCategory().getId(),
                 CategoryType.EXPENSE,
                 request.amount(),
-                "Pago de presupuesto: " + item.getName(),
+                payTitle,
+                payNotes,
                 request.date()
         );
 

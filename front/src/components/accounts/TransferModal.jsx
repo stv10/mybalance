@@ -220,7 +220,7 @@ const TransferModal = React.memo(({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               style={{ marginTop: '0.4rem', paddingLeft: '1rem' }}
-              maxLength={200}
+              maxLength={256}
             />
           </div>
 

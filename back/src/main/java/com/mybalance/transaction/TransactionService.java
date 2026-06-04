@@ -69,6 +69,7 @@ public class TransactionService {
                 .type(request.type())
                 .amount(request.amount())
                 .description(request.description())
+                .notes(request.notes())
                 .date(request.date())
                 .build();
 
@@ -119,6 +120,7 @@ public class TransactionService {
         transaction.setType(request.type());
         transaction.setAmount(request.amount());
         transaction.setDescription(request.description());
+        transaction.setNotes(request.notes());
         transaction.setDate(request.date());
 
         transaction = transactionRepository.save(transaction);
@@ -163,16 +165,26 @@ public class TransactionService {
         accountRepository.save(sourceAccount);
         accountRepository.save(destinationAccount);
 
-        String desc = request.description() != null && !request.description().trim().isEmpty() 
-                ? request.description().trim() 
-                : "Transferencia de " + sourceAccount.getName() + " a " + destinationAccount.getName();
+        String baseTransferDesc = "Transferencia de " + sourceAccount.getName() + " a " + destinationAccount.getName();
+        String title = "Transf: " + sourceAccount.getName() + " -> " + destinationAccount.getName();
+        if (title.length() > 32) {
+            title = title.substring(0, 32);
+        }
+        
+        String notes = (request.description() != null && !request.description().trim().isEmpty()) 
+                ? baseTransferDesc + ": " + request.description().trim() 
+                : baseTransferDesc;
+        if (notes.length() > 256) {
+            notes = notes.substring(0, 256);
+        }
 
         Transaction sourceTx = Transaction.builder()
                 .account(sourceAccount)
                 .category(transferExpense)
                 .type(CategoryType.EXPENSE)
                 .amount(request.amount())
-                .description(desc)
+                .description(title)
+                .notes(notes)
                 .date(request.date())
                 .build();
 
@@ -181,7 +193,8 @@ public class TransactionService {
                 .category(transferIncome)
                 .type(CategoryType.INCOME)
                 .amount(request.amount())
-                .description(desc)
+                .description(title)
+                .notes(notes)
                 .date(request.date())
                 .build();
 
@@ -212,6 +225,7 @@ public class TransactionService {
                 transaction.getType(),
                 transaction.getAmount(),
                 transaction.getDescription(),
+                transaction.getNotes(),
                 transaction.getDate(),
                 transaction.getCreatedAt()
         );

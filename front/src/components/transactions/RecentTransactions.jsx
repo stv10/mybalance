@@ -53,8 +53,17 @@ const RecentTransactions = ({ transactions, limit = 5, onViewAll }) => {
                   {tx.type === 'INCOME' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
                 </div>
                 <div className="recent-transaction-info">
-                  <span className="recent-transaction-desc">{tx.description || 'Sin descripción'}</span>
-                  <span className="recent-transaction-meta">
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <span className="recent-transaction-desc" style={{ color: 'var(--text-primary)' }}>
+                      {tx.description || 'Sin título'}
+                    </span>
+                    {tx.notes && (
+                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.1rem' }}>
+                        {tx.notes}
+                      </span>
+                    )}
+                  </div>
+                  <span className="recent-transaction-meta" style={{ marginTop: '0.25rem' }}>
                     <span className="badge badge-neutral" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem', marginRight: '0.35rem' }}>
                       {tx.categoryName}
                     </span>
