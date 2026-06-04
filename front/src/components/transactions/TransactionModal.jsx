@@ -156,17 +156,42 @@ const TransactionModal = ({
               )}
             </div>
 
-            {/* Description */}
-            <div className="form-group" style={{ marginBottom: 0 }}>
-              <label className="form-label">Descripción / Comentario</label>
-              <textarea
-                placeholder="Ej: Compra mensual supermercado, Pago consultoría..."
-                className="form-textarea"
-                value={formData.description}
+            {/* Title (Mapped to description in API) */}
+            <div className="form-group">
+              <label className="form-label">Título</label>
+              <input
+                type="text"
+                placeholder="Ej: Compra supermercado, Pago consultoría..."
+                className="form-input"
+                value={formData.description || ''}
                 onChange={(e) => onFormChange({ description: e.target.value })}
-                maxLength={255}
+                maxLength={32}
+                disabled={isSaving}
+                required
+              />
+              {formErrors.description && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--error)', marginTop: '0.25rem', display: 'block' }}>
+                  {formErrors.description}
+                </span>
+              )}
+            </div>
+
+            {/* Notes / Observations */}
+            <div className="form-group" style={{ marginBottom: 0 }}>
+              <label className="form-label">Observaciones / Comentario</label>
+              <textarea
+                placeholder="Detalles adicionales opcionales..."
+                className="form-textarea"
+                value={formData.notes || ''}
+                onChange={(e) => onFormChange({ notes: e.target.value })}
+                maxLength={256}
                 disabled={isSaving}
               />
+              {formErrors.notes && (
+                <span style={{ fontSize: '0.75rem', color: 'var(--error)', marginTop: '0.25rem', display: 'block' }}>
+                  {formErrors.notes}
+                </span>
+              )}
             </div>
           </div>
 

@@ -108,7 +108,8 @@ class BotTransactionHandlerTest {
         assertEquals("Comida", result.getCategory().getName());
         assertEquals(CategoryType.EXPENSE, result.getType());
         assertEquals(new BigDecimal("50.00"), result.getAmount());
-        assertEquals("Gaste 50 en comida de la cuenta Principal", result.getDescription());
+        assertEquals("Gaste 50 en comida de la cuenta ", result.getDescription());
+        assertEquals("Gaste 50 en comida de la cuenta Principal", result.getNotes());
 
         // Verificar descuento de saldo: 500.00 - 50.00 = 450.00
         assertEquals(new BigDecimal("450.00"), accountPrincipal.getBalance());
@@ -137,6 +138,8 @@ class BotTransactionHandlerTest {
         // Fallback a accounts.get(0) -> accountEfectivo
         assertEquals(accountEfectivo, result.getAccount());
         assertEquals(new BigDecimal("70.00"), accountEfectivo.getBalance()); // 100.00 - 30.00
+        assertEquals("Gaste 30 en comida con banco X", result.getDescription());
+        assertEquals("Gaste 30 en comida con banco X", result.getNotes());
         verify(accountRepository, times(1)).save(accountEfectivo);
     }
 
@@ -165,6 +168,8 @@ class BotTransactionHandlerTest {
 
         assertNotNull(result);
         assertEquals("Sushi", result.getCategory().getName());
+        assertEquals("Gaste 1200 en Sushi", result.getDescription());
+        assertEquals("Gaste 1200 en Sushi", result.getNotes());
         verify(categoryRepository, times(1)).save(any(Category.class));
     }
 
@@ -189,6 +194,8 @@ class BotTransactionHandlerTest {
         assertEquals(CategoryType.INCOME, result.getType());
         // Incrementar saldo: 500.00 + 15000.00 = 15500.00
         assertEquals(new BigDecimal("15500.00"), accountPrincipal.getBalance());
+        assertEquals("Cobre mi sueldo de 15000", result.getDescription());
+        assertEquals("Cobre mi sueldo de 15000", result.getNotes());
         verify(accountRepository, times(1)).save(accountPrincipal);
     }
 

@@ -38,7 +38,8 @@ Table transactions {
   category_id uuid [not null]
   type varchar(20) [not null, note: 'Identificador: "income" o "expense"']
   amount decimal(15,2) [not null]
-  description text
+  description varchar(32) [note: 'Título de la transacción']
+  notes varchar(256) [note: 'Observaciones o comentarios adicionales']
   date date [not null, note: 'Fecha en la que ocurrió la transacción']
   created_at timestamp [default: `now()`]
 }

@@ -302,6 +302,7 @@ class BudgetServiceTest {
                 "Vida",
                 CategoryType.EXPENSE,
                 amount,
+                "Pago: Supermercado",
                 "Pago de presupuesto: Supermercado",
                 date,
                 java.time.LocalDateTime.now()

@@ -79,7 +79,7 @@ class TransactionServiceTest {
     @DisplayName("Debería restar saldo al crear una transacción de GASTO")
     void testCreateExpenseTransactionRecalculatesBalance() {
         TransactionRequest request = new TransactionRequest(
-                accountId, categoryExpenseId, CategoryType.EXPENSE, new BigDecimal("30.00"), "Cena", LocalDate.now()
+                accountId, categoryExpenseId, CategoryType.EXPENSE, new BigDecimal("30.00"), "Cena", "Cena notes", LocalDate.now()
         );
 
         when(accountRepository.findByIdAndUserEmail(accountId, userEmail)).thenReturn(Optional.of(account));
@@ -102,7 +102,7 @@ class TransactionServiceTest {
     @DisplayName("Debería sumar saldo al crear una transacción de INGRESO")
     void testCreateIncomeTransactionRecalculatesBalance() {
         TransactionRequest request = new TransactionRequest(
-                accountId, categoryIncomeId, CategoryType.INCOME, new BigDecimal("50.00"), "Aguinaldo", LocalDate.now()
+                accountId, categoryIncomeId, CategoryType.INCOME, new BigDecimal("50.00"), "Aguinaldo", "Aguinaldo notes", LocalDate.now()
         );
 
         when(accountRepository.findByIdAndUserEmail(accountId, userEmail)).thenReturn(Optional.of(account));
@@ -134,7 +134,7 @@ class TransactionServiceTest {
                 .build();
 
         TransactionRequest request = new TransactionRequest(
-                accountId, categoryExpenseId, CategoryType.EXPENSE, new BigDecimal("40.00"), "Cena Premium", LocalDate.now()
+                accountId, categoryExpenseId, CategoryType.EXPENSE, new BigDecimal("40.00"), "Cena Premium", "Cena Premium notes", LocalDate.now()
         );
 
         when(transactionRepository.findByIdAndAccountUserEmail(transactionId, userEmail)).thenReturn(Optional.of(existing));
@@ -168,7 +168,7 @@ class TransactionServiceTest {
 
         // Petición con un different accountId
         TransactionRequest request = new TransactionRequest(
-                otherAccountId, categoryExpenseId, CategoryType.EXPENSE, new BigDecimal("30.00"), "Cena", LocalDate.now()
+                otherAccountId, categoryExpenseId, CategoryType.EXPENSE, new BigDecimal("30.00"), "Cena", null, LocalDate.now()
         );
 
         when(transactionRepository.findByIdAndAccountUserEmail(transactionId, userEmail)).thenReturn(Optional.of(existing));

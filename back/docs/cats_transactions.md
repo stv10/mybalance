@@ -20,7 +20,7 @@ Se implementaron todos los modelos y relaciones utilizando anotaciones JPA está
 4. **`Transaction`**:
    - Mapeada a la tabla `transactions`.
    - Relación `@ManyToOne` (LAZY) con `Account` (en lugar del usuario directo) y con `Category` (LAZY).
-   - Campos: `amount` (BigDecimal de precisión 15, escala 2), `description` (TEXT), `date` (LocalDate) y `type` (Enum `CategoryType`).
+   - Campos: `amount` (BigDecimal de precisión 15, escala 2), `description` (VARCHAR(32) que actúa como Título), `notes` (VARCHAR(256) para observaciones o comentarios adicionales), `date` (LocalDate) y `type` (Enum `CategoryType`).
 
 ---
 

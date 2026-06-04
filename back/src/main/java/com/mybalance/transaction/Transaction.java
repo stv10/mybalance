@@ -40,8 +40,11 @@ public class Transaction {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal amount;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(length = 32)
     private String description;
+
+    @Column(length = 256)
+    private String notes;
 
     @Column(nullable = false)
     private LocalDate date;
